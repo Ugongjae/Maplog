@@ -1,11 +1,13 @@
 package com.maplog.b.home.controller;
 
+import com.maplog.b.home.model.Block;
 import com.maplog.b.home.service.BlockDao;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/home")
@@ -14,8 +16,8 @@ public class HomeContoller {
     BlockDao blockDao;
 
     @GetMapping(value="/block")
-    public void getAllBlocks(){
-
+    public List<Block> getAllBlocks(){
+        return blockDao.selectAllBlocks();
     }
 
     @GetMapping(value="/block/sample")
