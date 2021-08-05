@@ -16,6 +16,7 @@ public class HomeContoller {
     @Autowired
     BlockDao blockDao;
 
+
     @GetMapping(value="/block")
     public List<Block> getAllBlocks(){
         return blockDao.selectAllBlocks();
