@@ -18,8 +18,13 @@ public class BlockDao{
         return jdbcTemplate.query(query, new BeanPropertyRowMapper<Block>(Block.class));
     }
 
-    public int makeSample(int x,int y,String color){
-        String query = "INSERT INTO block(x,y,color) VALUES(?,?,?)";
-        return jdbcTemplate.update(query,x,y,color);
+    public Block selectBlockById(Long id){
+        String query = "Select * from block where id=?";
+        return jdbcTemplate.queryForObject(query,new Object[]{id},new BeanPropertyRowMapper<>(Block.class));
+    }
+
+    public int makeSample(int x,int y,String color,Long userId){
+        String query = "INSERT INTO block(x,y,color,user_id) VALUES(?,?,?,?)";
+        return jdbcTemplate.update(query,x,y,color,userId);
     }
 }
