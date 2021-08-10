@@ -1,11 +1,11 @@
 package com.maplog.b.login.service;
 
 import com.google.gson.JsonObject;
+import com.maplog.b.login.model.GithubToken;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -42,10 +42,19 @@ public class GithubLogin {
 
         HttpEntity<Map<String,String>> httpEntity = new HttpEntity<>(map,httpHeaders);
 
-        ResponseEntity<String> responseEntity = rt.postForEntity(address,httpEntity,String.class);
+        GithubToken githubToken = rt.postForObject(address,map,GithubToken.class);
+
+        getAuthorization(githubToken);
+    }
 
 
+    private void getAuthorization(GithubToken githubToken){
+        String address = "https://api.github.com/user";
 
-        System.out.println(responseEntity.getBody());
+        HttpHeaders header = new HttpHeaders();
+        header.setBearerAuth(githubToken.getAccessToken());
+
+        RestTemplate rt = new RestTemplate();
+        HttpEntity httpEntity = new HttpEntity(header);
     }
 }
