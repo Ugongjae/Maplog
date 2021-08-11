@@ -1,11 +1,12 @@
 package com.maplog.b.login.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
 import com.maplog.b.login.model.GithubToken;
+import com.maplog.b.login.model.GithubUser;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
@@ -44,11 +45,15 @@ public class GithubLogin {
 
         GithubToken githubToken = rt.postForObject(address,map,GithubToken.class);
 
-        getAuthorization(githubToken);
+        try {
+            getAuthorization(githubToken);
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
     }
 
 
-    private void getAuthorization(GithubToken githubToken){
+    private void getAuthorization(GithubToken githubToken) throws JsonProcessingException {
         String address = "https://api.github.com/user";
 
         HttpHeaders header = new HttpHeaders();
@@ -56,5 +61,12 @@ public class GithubLogin {
 
         RestTemplate rt = new RestTemplate();
         HttpEntity httpEntity = new HttpEntity(header);
+
+        ResponseEntity<String> response = rt.exchange(address,HttpMethod.GET,httpEntity,String.class);
+
+        ObjectMapper objectMapper = new ObjectMapper(); // TODO - Parsing response to object
+        GithubUser githubUser = objectMapper.readValue(response.getBody(),GithubUser.class);
+
+        System.out.println(githubUser.getLogin());
     }
 }
