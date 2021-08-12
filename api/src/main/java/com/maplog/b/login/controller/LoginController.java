@@ -15,7 +15,7 @@ public class LoginController {
 
     @GetMapping(value="/oauth/github")
     public void getAuthByGithub(@RequestParam String code){
-        githubLogin.getAccessToken("e0197c671d7bfc24c476");
+        githubLogin.getAccessToken("64512667bbba7d53df44");
     }
 
 }

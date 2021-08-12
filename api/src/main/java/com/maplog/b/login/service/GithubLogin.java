@@ -1,10 +1,11 @@
 package com.maplog.b.login.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.maplog.b.login.model.GithubToken;
 import com.maplog.b.login.model.GithubUser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -16,15 +17,18 @@ import java.util.Map;
 @Service
 public class GithubLogin {
 
+    @Autowired
+    private GithubUserDao githubUserDao;
+
     @Value("${oauth.github.client-id}")
     private String clientId;
 
     @Value("${oauth.github.client-secret}")
     private String clientSecret;
 
-
     public void getAccessToken(String code){
         String address = "https://github.com/login/oauth/access_token";
+        GithubUser githubUser = null;
 
         RestTemplate rt = new RestTemplate();
 
@@ -46,14 +50,25 @@ public class GithubLogin {
         GithubToken githubToken = rt.postForObject(address,map,GithubToken.class);
 
         try {
-            getAuthorization(githubToken);
+            githubUser = getAuthorization(githubToken);
         } catch (JsonProcessingException e) {
             e.printStackTrace();
+        }
+
+        if(githubUser == null){
+            return;
+        }
+        System.out.println(githubUser.getLogin()+" "+githubUser.getName()+" "+githubUser.getId());
+
+        if(!githubUserDao.isExistId(githubUser)){
+            System.out.println("ssssss");
+        }else{
+            System.out.println("fffff");
         }
     }
 
 
-    private void getAuthorization(GithubToken githubToken) throws JsonProcessingException {
+    private GithubUser getAuthorization(GithubToken githubToken) throws JsonProcessingException {
         String address = "https://api.github.com/user";
 
         HttpHeaders header = new HttpHeaders();
@@ -64,9 +79,13 @@ public class GithubLogin {
 
         ResponseEntity<String> response = rt.exchange(address,HttpMethod.GET,httpEntity,String.class);
 
-        ObjectMapper objectMapper = new ObjectMapper(); // TODO - Parsing response to object
-        GithubUser githubUser = objectMapper.readValue(response.getBody(),GithubUser.class);
+        if(response.getStatusCode() != HttpStatus.OK){
+            return null;
+        }
 
-        System.out.println(githubUser.getLogin());
+        JsonObject jsonObject = (JsonObject) JsonParser.parseString(response.getBody());
+        GithubUser githubUser = new GithubUser(jsonObject.get("login").getAsString(),jsonObject.get("id").getAsLong(),jsonObject.get("avatar_url").getAsString(),jsonObject.get("name").getAsString());
+
+        return githubUser;
     }
 }
