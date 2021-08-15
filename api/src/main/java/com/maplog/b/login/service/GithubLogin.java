@@ -5,8 +5,10 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.maplog.b.login.model.GithubToken;
 import com.maplog.b.login.model.GithubUser;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -15,15 +17,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
+@Getter
+@Setter
+@ConfigurationProperties(prefix="oauth.github")
 public class GithubLogin {
 
     @Autowired
     private GithubUserDao githubUserDao;
 
-    @Value("${oauth.github.client-id}")
     private String clientId;
-
-    @Value("${oauth.github.client-secret}")
     private String clientSecret;
 
     public void getAccessToken(String code){
