@@ -61,7 +61,7 @@ public class GithubLogin {
         System.out.println(githubUser.getLogin()+" "+githubUser.getName()+" "+githubUser.getId());
 
         if(!githubUserDao.isExistId(githubUser)){
-            System.out.println("ssssss");
+            githubUserDao.insertUser(githubUser);
         }else{
             System.out.println("fffff");
         }

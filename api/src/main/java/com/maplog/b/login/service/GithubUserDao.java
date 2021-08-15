@@ -11,8 +11,15 @@ public class GithubUserDao {
     private JdbcTemplate jdbcTemplate;
 
     public boolean isExistId(GithubUser githubUser){
-        String query = "SELECT EXISTS(SELECT 1 FROM GithubUser WHERE login=? and id=?";
+        String query = "SELECT EXISTS(SELECT 1 FROM GithubUser WHERE login=? and id=?)";
+        return jdbcTemplate.queryForObject(query,Boolean.class,githubUser.getLogin(),githubUser.getId());
+    }
 
-        return jdbcTemplate.queryForObject(query,Boolean.class,githubUser); // TODO -  it return exception
+    public int insertUser(GithubUser githubUser){
+        String query = "INSERT INTO GithubUser(login,id,avatar_url,name) VALUES(?,?,?,?)";
+        return jdbcTemplate.update(query,githubUser.getLogin(),
+                githubUser.getId(),
+                githubUser.getAvatarUrl(),
+                githubUser.getName());
     }
 }
