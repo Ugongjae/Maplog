@@ -25,29 +25,22 @@ public class GithubLogin {
     @Autowired
     private GithubUserDao githubUserDao;
 
+    @Autowired
+    private JwtService jwtService;
+
     private String clientId;
     private String clientSecret;
 
-    public void getAccessToken(String code){
+    public String getAccessToken(String code){
         String address = "https://github.com/login/oauth/access_token";
         GithubUser githubUser = null;
 
         RestTemplate rt = new RestTemplate();
 
-        JsonObject jsonObject = new JsonObject();
-        jsonObject.addProperty("code",code);
-        jsonObject.addProperty("client_id",clientId);
-        jsonObject.addProperty("client_secret",clientSecret);
-
         Map<String,String> map=new HashMap<>();
         map.put("code",code);
         map.put("client_id",clientId);
         map.put("client_secret",clientSecret);
-
-        HttpHeaders httpHeaders = new HttpHeaders();
-        httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-
-        HttpEntity<Map<String,String>> httpEntity = new HttpEntity<>(map,httpHeaders);
 
         GithubToken githubToken = rt.postForObject(address,map,GithubToken.class);
 
@@ -58,15 +51,19 @@ public class GithubLogin {
         }
 
         if(githubUser == null){
-            return;
+            return null;
         }
         System.out.println(githubUser.getLogin()+" "+githubUser.getName()+" "+githubUser.getId());
 
         if(!githubUserDao.isExistId(githubUser)){
             githubUserDao.insertUser(githubUser);
         }else{
-            System.out.println("fffff");
+
         }
+
+        String token = jwtService.createJwtToken(githubUser.getLogin(),githubUser.getName(),githubUser.getId());
+
+        return token;
     }
 
 
