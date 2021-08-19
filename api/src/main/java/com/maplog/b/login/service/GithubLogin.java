@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.HashMap;
@@ -26,7 +28,7 @@ public class GithubLogin {
     private GithubUserDao githubUserDao;
 
     @Autowired
-    private JwtService jwtService;
+    private JwtProvider jwtProvider;
 
     private String clientId;
     private String clientSecret;
@@ -42,7 +44,14 @@ public class GithubLogin {
         map.put("client_id",clientId);
         map.put("client_secret",clientSecret);
 
-        GithubToken githubToken = rt.postForObject(address,map,GithubToken.class);
+        GithubToken githubToken=null;
+        try {
+            githubToken = rt.postForObject(address, map, GithubToken.class);
+            System.out.println(githubToken);
+        } catch(HttpClientErrorException | HttpServerErrorException httpClientOrServerExc){
+            return null;
+        }
+
 
         try {
             githubUser = getAuthorization(githubToken);
@@ -61,7 +70,7 @@ public class GithubLogin {
 
         }
 
-        String token = jwtService.createJwtToken(githubUser.getLogin(),githubUser.getName(),githubUser.getId());
+        String token = jwtProvider.createJwtToken(githubUser.getLogin(),githubUser.getName(),githubUser.getId());
 
         return token;
     }

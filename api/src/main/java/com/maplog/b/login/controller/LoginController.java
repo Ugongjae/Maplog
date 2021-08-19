@@ -18,4 +18,9 @@ public class LoginController {
         return githubLogin.getAccessToken(code);
     }
 
+
+    @GetMapping(value="/test")
+    public String test(){
+        return "hello";
+    }
 }
