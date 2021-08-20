@@ -47,7 +47,6 @@ public class GithubLogin {
         GithubToken githubToken=null;
         try {
             githubToken = rt.postForObject(address, map, GithubToken.class);
-            System.out.println(githubToken);
         } catch(HttpClientErrorException | HttpServerErrorException httpClientOrServerExc){
             return null;
         }
@@ -62,7 +61,6 @@ public class GithubLogin {
         if(githubUser == null){
             return null;
         }
-        System.out.println(githubUser.getLogin()+" "+githubUser.getName()+" "+githubUser.getId());
 
         if(!githubUserDao.isExistId(githubUser)){
             githubUserDao.insertUser(githubUser);

@@ -46,13 +46,13 @@ public class JwtProvider {
             Jws<Claims> claims = Jwts.parser().setSigningKey(secret.getBytes()).parseClaimsJws(token);
             return true;
         } catch (SignatureException e){
-            System.out.println("ff1");
+
         } catch (MalformedJwtException e){
-            System.out.println("ff2");
+
         } catch (UnsupportedJwtException e){
-            System.out.println("ff3");
+
         } catch (IllegalArgumentException e){
-            System.out.println("ff4");
+
         }
         return false;
     }
@@ -62,7 +62,6 @@ public class JwtProvider {
                 .setSigningKey(secret.getBytes())
                 .parseClaimsJws(token)
                 .getBody();
-        System.out.println(claims.get("login"));
 
         return claims.get("login",String.class);
     }
@@ -75,7 +74,7 @@ public class JwtProvider {
         return null;
     }
 
-    private Claims getClaims(String token){
+    public Claims getClaims(String token){
         return Jwts.parser()
                 .setSigningKey(secret.getBytes())
                 .parseClaimsJws(token)
